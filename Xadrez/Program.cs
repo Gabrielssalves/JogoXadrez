@@ -1,14 +1,35 @@
 ﻿using System;
 using tabuleiro;
+using xadrez;
 
 namespace Xadrez {
     class Program {
         static void Main(string[] args) {
 
-            Tabuleiro tabuleiro = new Tabuleiro(8, 8);
+            try {
+                PartidaXadrez partida = new PartidaXadrez();
+
+                while (!partida.terminada) {
+                    Console.Clear();
+                    Tela.imprimirTabuleiro(partida.tabuleiro);
+
+                    Console.Write("Origem:");
+                    Posicao origem = Tela.lerPosicaoXadrez().toPosicao();
+                    Console.Write("Destino:");
+                    Posicao destino = Tela.lerPosicaoXadrez().toPosicao();
+
+                    partida.executaMovimento(origem, destino);
+
+                }
 
 
-            Tela.imprimirTabuleiro(tabuleiro);
+            }
+            catch(TabuleiroException e) {
+                Console.WriteLine(e.Message);
+            }
+
+
+            
             Console.ReadLine();
         }
     }

@@ -13,5 +13,9 @@ namespace tabuleiro {
             this.tabuleiro = tabuleiro;
             qtdeMovimentos = 0;
         }
+
+        public void incrementarQtdeMovimentos() {
+            qtdeMovimentos++;
+        }
     }
 }
