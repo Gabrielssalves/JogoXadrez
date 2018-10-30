@@ -24,7 +24,9 @@ namespace xadrez {
         }
 
         private void gerarPecas() {
-            tabuleiro.colocarPeca(new Bispo(tabuleiro, Cor.Preta), new PosicaoXadrez(1, 'c').toPosicao());
+            tabuleiro.colocarPeca(new Torre(tabuleiro, Cor.Preta), new PosicaoXadrez(1, 'c').toPosicao());
+            tabuleiro.colocarPeca(new Bispo(tabuleiro, Cor.Branca), new PosicaoXadrez(7, 'c').toPosicao());
+            tabuleiro.colocarPeca(new Rainha(tabuleiro, Cor.Preta), new PosicaoXadrez(7, 'g').toPosicao());
         }
 
 
