@@ -14,7 +14,7 @@ namespace Xadrez {
                 }
                 Console.WriteLine();
             }
-            Console.WriteLine("  A  B  C  D  E  F  G  H  ");
+            Console.WriteLine("  a  b  c  d  e  f  g  h  ");
             Console.WriteLine();
         }
 
@@ -38,13 +38,12 @@ namespace Xadrez {
                 Console.WriteLine();
             }
             Console.BackgroundColor = fundoOriginal;
-            Console.WriteLine("  A  B  C  D  E  F  G  H  ");
+            Console.WriteLine("  a  b  c  d  e  f  g  h  ");
             Console.WriteLine();
         }
 
         public static PosicaoXadrez lerPosicaoXadrez() {
             string posicao = Console.ReadLine();
-            Console.Write("Coluna:");
             char coluna = posicao[0];
             int linha = int.Parse(posicao[1] + "");            
             return new PosicaoXadrez(linha, coluna); 

@@ -8,18 +8,28 @@ namespace xadrez {
 
         }
 
-        protected bool podeMover(Posicao posicao) {
+        protected bool podeMover(Posicao posicao, bool aceitaPosVazia) {
             Peca peca = tabuleiro.peca(posicao);
-            return peca == null || peca.cor != this.cor;
+            if (aceitaPosVazia) {
+                return peca == null || peca.cor != this.cor;
+            }
+            else {
+                if (peca == null) {
+                    return false;
+                }
+                else {
+                    return peca.cor != this.cor;
+                }
+            }
         }
 
-        protected void schemaValidarMovimento(int variacaoLinha, int variacaoColuna, Posicao pos, bool[,] mat, int QtdeMaximaRecursao) {
+        protected void schemaValidarMovimento(int variacaoLinha, int variacaoColuna, Posicao pos, bool[,] mat, int QtdeMaximaRecursao, bool aceitaPosVazia) {
 
             pos.defineValores(pos.linha + variacaoLinha, pos.coluna + variacaoColuna);
-            if (tabuleiro.verificaValoresPosicao(pos) && podeMover(pos)) {
+            if (tabuleiro.verificaValoresPosicao(pos) && podeMover(pos, aceitaPosVazia)) {
                 mat[pos.linha, pos.coluna] = true;
                 if ((tabuleiro.peca(pos) == null || tabuleiro.peca(pos).cor == this.cor) && (QtdeMaximaRecursao != 0)) {
-                    schemaValidarMovimento(variacaoLinha, variacaoColuna, pos, mat, QtdeMaximaRecursao--);
+                    schemaValidarMovimento(variacaoLinha, variacaoColuna, pos, mat, --QtdeMaximaRecursao, aceitaPosVazia);
                 }
             }
             pos.defineValores(posicao.linha, posicao.coluna);

@@ -7,7 +7,7 @@ namespace xadrez {
         }
 
         public override string ToString() {
-            return "R";
+            return "D";
         }
 
         public override bool[,] movimentosPossiveis() {
@@ -17,7 +17,7 @@ namespace xadrez {
 
             for (int i = -1; i < 2; i++) {
                 for (int j = -1; j < 2; j++) {
-                    schemaValidarMovimento(i, j, pos, mat, 99);
+                    schemaValidarMovimento(i, j, pos, mat, 99, true);
                 }
             }
 

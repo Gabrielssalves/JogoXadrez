@@ -18,10 +18,13 @@ namespace xadrez {
             Posicao pos = new Posicao(0, 0);
             pos.defineValores(posicao.linha, posicao.coluna);
 
-            schemaValidarMovimento(1, 0, pos, mat,99);
-            schemaValidarMovimento(0, 1, pos, mat,99);
-            schemaValidarMovimento(-1, 0, pos, mat,99);
-            schemaValidarMovimento(0, -1, pos, mat,99);
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++) {
+                    if (i != j) {
+                        schemaValidarMovimento(i, j, pos, mat, 99, true);
+                    }
+                }
+            }
 
             return mat;
         }
