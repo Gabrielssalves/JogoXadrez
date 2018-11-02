@@ -1,10 +1,59 @@
 ﻿using System;
 using tabuleiro;
 using xadrez;
+using System.Collections.Generic;
 
 namespace Xadrez {
     class Tela {
         
+
+        public static void imprimirPartida(PartidaXadrez partida) {
+            imprimirTabuleiro(partida.tabuleiro);
+            Console.WriteLine();
+            imprimirPecasCapturadas(partida);
+
+            Console.WriteLine();
+            Console.WriteLine("Turno: " + partida.turno);
+            if (!partida.terminada) {
+                Console.Write("Aguardando jogada: ");
+                ConsoleColor aux = Console.ForegroundColor;
+                if (partida.jogadorAtual == Cor.Preta) {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                }
+                Console.WriteLine(partida.jogadorAtual);
+                Console.ForegroundColor = aux;
+                Console.WriteLine();
+                if (partida.xeque) {
+                    Console.WriteLine("XEQUE!");
+                }
+            }
+            else {
+                Console.WriteLine("XEQUEMATE!");
+                Console.WriteLine("Vencedor: " + partida.jogadorAtual);
+            }
+            
+        }
+
+        public static void imprimirPecasCapturadas(PartidaXadrez partida) {
+            Console.WriteLine("Peças Capturadas: ");
+            Console.Write("Brancas: ");
+            imprimirConjunto(partida.pecasCapturadas(Cor.Branca));
+            Console.WriteLine();
+            ConsoleColor aux = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("Pretas: ");
+            imprimirConjunto(partida.pecasCapturadas(Cor.Preta));
+            Console.ForegroundColor = aux;
+            Console.WriteLine();
+        }
+
+        public static void imprimirConjunto(HashSet<Peca> conjunto) {
+            Console.Write("[");
+            foreach(Peca x in conjunto) {
+                Console.Write(x + " ");
+            }
+            Console.Write("]");
+        }
         public static void imprimirTabuleiro(Tabuleiro tabuleiro) {
 
             for(int i = 0; i<tabuleiro.linha; i++) {
