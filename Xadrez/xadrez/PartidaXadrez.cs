@@ -12,12 +12,14 @@ namespace xadrez {
         private HashSet<Peca> pecas;
         private HashSet<Peca> capturadas;
         public bool xeque { get; private set; }
+        public Peca vulneravelEnPassant { get; private set; }
 
         public PartidaXadrez() {
             tabuleiro = new Tabuleiro(8, 8);
             turno = 1;
             jogadorAtual = Cor.Branca;
             terminada = false;
+            vulneravelEnPassant = null;
             pecas = new HashSet<Peca>();
             capturadas = new HashSet<Peca>();
             gerarPecas();
@@ -48,17 +50,64 @@ namespace xadrez {
                 torre.incrementarQtdeMovimentos();
                 tabuleiro.colocarPeca(torre, destinoTorre);
             }
+            //#Jogada Especial En Passant
+            if(peca is Peao) {
+                if(origem.coluna != destino.coluna && pecaCapturada == null) {
+                    Posicao posPeaoCapturado;
+                    if(peca.cor == Cor.Branca) {
+                        posPeaoCapturado = new Posicao(destino.linha + 1, destino.coluna);
+                    }
+                    else {
+                        posPeaoCapturado = new Posicao(destino.linha - 1, destino.coluna);
+                    }
+                    pecaCapturada = tabuleiro.retirarPeca(posPeaoCapturado);
+                    capturadas.Add(pecaCapturada);
+                }
+            }
             return pecaCapturada;
         }
 
-        public void desfazMovimento(Posicao origem, Posicao destino, Peca capturada) {
-            Peca p = tabuleiro.retirarPeca(destino);
-            p.decrementarQtdeMovimentos();
-            if(capturada != null) {
-                tabuleiro.colocarPeca(capturada, destino);
-                capturadas.Remove(capturada);
+        public void desfazMovimento(Posicao origem, Posicao destino, Peca pecaCapturada) {
+            Peca peca = tabuleiro.retirarPeca(destino);
+            peca.decrementarQtdeMovimentos();
+            if(pecaCapturada != null) {
+                tabuleiro.colocarPeca(pecaCapturada, destino);
+                capturadas.Remove(pecaCapturada);
             }
-            tabuleiro.colocarPeca(p, origem);
+            tabuleiro.colocarPeca(peca, origem);
+
+            //#Jogada Especial Roque Pequeno
+            if (peca is Rei && destino.coluna == origem.coluna + 2) {
+                Posicao origemTorre = new Posicao(origem.linha, origem.coluna + 3);
+                Posicao destinoTorre = new Posicao(origem.linha, origem.coluna + 1);
+                Peca torre = tabuleiro.retirarPeca(destinoTorre);
+                torre.decrementarQtdeMovimentos();
+                tabuleiro.colocarPeca(torre, origemTorre);
+            }
+            //#Jogada Especial Roque Grade
+            if (peca is Rei && destino.coluna == origem.coluna - 2) {
+                Posicao origemTorre = new Posicao(origem.linha, origem.coluna - 4);
+                Posicao destinoTorre = new Posicao(origem.linha, origem.coluna - 1);
+                Peca torre = tabuleiro.retirarPeca(destinoTorre);
+                torre.decrementarQtdeMovimentos();
+                tabuleiro.colocarPeca(torre, origemTorre);
+            }
+            //#Jogada Especial En Passant
+            if (peca is Peao) {
+                if (origem.coluna != destino.coluna && pecaCapturada == vulneravelEnPassant) {
+                    Peca PeaoCapturado = tabuleiro.retirarPeca(destino);
+                    Posicao posPeaoCapturado;
+                    if (peca.cor == Cor.Branca) {
+                        posPeaoCapturado = new Posicao(3, destino.coluna);
+                    }
+                    else {
+                        posPeaoCapturado = new Posicao(4, destino.coluna);
+                    }
+                    pecaCapturada = tabuleiro.retirarPeca(posPeaoCapturado);
+                    capturadas.Remove(pecaCapturada);
+                }
+            }
+
         }
 
         public void realizaJogada (Posicao origem, Posicao destino) {
@@ -66,6 +115,19 @@ namespace xadrez {
             if (estaEmXeque(jogadorAtual)) {
                 desfazMovimento(origem, destino, pecaCapturada);
                 throw new TabuleiroException("Você não pode se colocar em xeque!");
+            }
+
+            Peca peca = tabuleiro.peca(destino);
+
+            //Jogada especial promoção
+            if (peca is Peao) {
+                if ((peca.cor == Cor.Branca && destino.linha == 0) || (peca.cor == Cor.Preta && destino.linha == 7)) {
+                    peca = tabuleiro.retirarPeca(destino);
+                    pecas.Remove(peca);
+                    Peca dama = new Rainha(tabuleiro, peca.cor);
+                    tabuleiro.colocarPeca(dama, destino);
+                    pecas.Add(dama);
+                }
             }
             if (estaEmXeque(adversaria(jogadorAtual))) {
                 xeque = true;
@@ -80,6 +142,16 @@ namespace xadrez {
             else {
                 turno++;
                 mudaJogador();
+            }
+
+            
+            // # Jogada especial en passant
+
+            if (peca is Peao && (destino.linha == origem.linha - 2 || destino.linha == origem.linha + 2)) {
+                vulneravelEnPassant = peca;
+            }
+            else {
+                vulneravelEnPassant = null;
             }
         }
 
@@ -126,7 +198,7 @@ namespace xadrez {
             colocarNovaPeca(8, 'e', new Rei(tabuleiro, Cor.Preta, this));
 
             for (int i = 0; i < 8; i++) {
-                colocarNovaPeca(7, Convert.ToChar('a' + i), new Peao(tabuleiro, Cor.Preta));
+                colocarNovaPeca(7, Convert.ToChar('a' + i), new Peao(tabuleiro, Cor.Preta, this));
             }
 
             colocarNovaPeca(1, 'a', new Torre(tabuleiro, Cor.Branca));
@@ -139,7 +211,7 @@ namespace xadrez {
             colocarNovaPeca(1, 'e', new Rei(tabuleiro, Cor.Branca, this));
 
             for (int i = 0; i < 8; i++) {
-                colocarNovaPeca(2, Convert.ToChar('a' + i), new Peao(tabuleiro, Cor.Branca));
+                colocarNovaPeca(2, Convert.ToChar('a' + i), new Peao(tabuleiro, Cor.Branca, this));
             }
         }
 

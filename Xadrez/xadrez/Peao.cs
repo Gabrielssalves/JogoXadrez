@@ -4,8 +4,10 @@ using tabuleiro;
 namespace xadrez {
     class Peao : PecaXadrez {
 
-        public Peao(Tabuleiro tabuleiro, Cor cor) : base(tabuleiro, cor) {
+        private PartidaXadrez partida;
 
+        public Peao(Tabuleiro tabuleiro, Cor cor, PartidaXadrez partida) : base(tabuleiro, cor) {
+            this.partida = partida;
         }
 
         public override string ToString() {
@@ -27,6 +29,18 @@ namespace xadrez {
                 }
                 schemaValidarMovimento(-1, 1, pos, mat, 0,false);
                 schemaValidarMovimento(-1, -1, pos, mat, 0, false);
+
+                //#Jogada especial en passant Esquerda
+                if(posicao.linha == 3) {
+                    Posicao esquerda = new Posicao(posicao.linha, posicao.coluna - 1);
+                    if(tabuleiro.verificaVagaPosicao(esquerda) && podeMover(esquerda, false) && tabuleiro.peca(esquerda) == partida.vulneravelEnPassant) {
+                        mat[esquerda.linha - 1 , esquerda.coluna] = true;
+                    }
+                    Posicao direita = new Posicao(posicao.linha, posicao.coluna + 1);
+                    if (tabuleiro.verificaVagaPosicao(direita) && podeMover(direita, false) && tabuleiro.peca(direita) == partida.vulneravelEnPassant) {
+                        mat[direita.linha - 1 , direita.coluna] = true;
+                    }
+                }
             }
             else {
                 if (qtdeMovimentos > 0) {
@@ -37,7 +51,20 @@ namespace xadrez {
                 }
                 schemaValidarMovimento(1, 1, pos, mat, 0, false);
                 schemaValidarMovimento(1, -1, pos, mat, 0, false);
+
+                //#Jogada especial en passant Direita
+                if (posicao.linha == 4) {
+                    Posicao esquerda = new Posicao(posicao.linha, posicao.coluna - 1);
+                    if (tabuleiro.verificaVagaPosicao(esquerda) && podeMover(esquerda, false) && tabuleiro.peca(esquerda) == partida.vulneravelEnPassant) {
+                        mat[esquerda.linha + 1, esquerda.coluna] = true;
+                    }
+                    Posicao direita = new Posicao(posicao.linha, posicao.coluna + 1);
+                    if (tabuleiro.verificaVagaPosicao(direita) && podeMover(direita, false) && tabuleiro.peca(direita) == partida.vulneravelEnPassant) {
+                        mat[direita.linha + 1, direita.coluna] = true;
+                    }
+                }
             }
+
             return mat;
         }
     }
